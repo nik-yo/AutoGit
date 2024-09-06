@@ -1,0 +1,16 @@
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: |
+      work_item=7015
+      timestamp=$(date '+%Y%m%d-%H%M%S')
+      new_branch=feature/branch
+      git checkout -b $new_branch
+      git stage $meta_filepath
+      git commit -m 'Update ResourceProviderMeta.json'
+      git status
+      git push -u origin $new_branch
+      echo $SYSTEM_ACCESSTOKEN | az devops login
+      az repos pr create -r 'Project' -s $new_branch -t qa --work-items $work_item --auto-complete true
+  env:
+    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
